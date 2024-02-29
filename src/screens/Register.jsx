@@ -36,7 +36,7 @@ const Register = ({ navigation }) => {
     //       Alert.alert("Invalid Register", error.message);
     //     }
     //   });
-    createUserWithEmailAndPassword(auth, email, password) // sign in user
+    await createUserWithEmailAndPassword(auth, email, password) // sign in user
       .then((response) => response.user.getIdToken()) //call user id token
       .then((token) => AsyncStorage.setItem("token", token)) // store token
       .then(() => {
