@@ -8,7 +8,7 @@ import {
   Alert,
   TouchableOpacity,
 } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { FIREBASE_AUTH } from "../helpers/firebase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -18,30 +18,20 @@ const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  useEffect(() => {
+    AsyncStorage.getItem("token").then((token) => {
+      if (token !== null) {
+        navigation.navigate("home");
+      }
+    });
+  }, []);
+
   const handleLogin = async () => {
-    // const response = await signInWithEmailAndPassword(auth, email, password)
-    //   .then((response) => {
-    //     console.log(response);
-    //     Alert.alert("Login Success", `Welcome ${response.user.email}`, [
-    //       {
-    //         text: "Ok",
-    //         onPress: () => navigation.navigate("home")
-    //       }
-    //     ]);
-    //   })
-    //   .catch((error) => {
-    //     console.error(error);
-    //     if (error.message === "Firebase: Error (auth/invalid-credential).") {
-    //       Alert.alert("Invalid Login", "Invalid credential email/password");
-    //     } else {
-    //       Alert.alert("Invalid Login", error.message);
-    //     }
-    //   });
     await signInWithEmailAndPassword(auth, email, password) // sign in user
-      .then((response) => response.user.getIdToken()) //call user id token
+      .then((response) => response.user.getIdToken()) // call user id token
       .then((token) => AsyncStorage.setItem("token", token)) // store token
       .then(() => {
-        Alert.alert("Login Success", `Welcome`, [
+        Alert.alert("Login Success", `Welcome to the app`, [
           {
             text: "Ok",
             onPress: () => navigation.navigate("home"),

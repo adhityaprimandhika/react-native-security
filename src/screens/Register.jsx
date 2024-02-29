@@ -8,7 +8,7 @@ import {
   Button,
 } from "react-native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FIREBASE_AUTH } from "../helpers/firebase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -17,30 +17,20 @@ const Register = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  useEffect(() => {
+    AsyncStorage.getItem("token").then((token) => {
+      if (token !== null) {
+        navigation.navigate("home");
+      }
+    });
+  }, []);
+
   const handleRegister = async () => {
-    // const response = await createUserWithEmailAndPassword(auth, email, password)
-    //   .then((response) => {
-    //     console.log(response);
-    //     Alert.alert("Register Success", `${response.user.email} created`, [
-    //       {
-    //         text: "Ok",
-    //         onPress: () => navigation.navigate("home"),
-    //       },
-    //     ]);
-    //   })
-    //   .catch((error) => {
-    //     console.error(error);
-    //     if (error.message === "Firebase: Error (auth/email-already-in-use).") {
-    //       Alert.alert("Invalid Register", "Email already in use");
-    //     } else {
-    //       Alert.alert("Invalid Register", error.message);
-    //     }
-    //   });
     await createUserWithEmailAndPassword(auth, email, password) // sign in user
-      .then((response) => response.user.getIdToken()) //call user id token
+      .then((response) => response.user.getIdToken()) // call user id token
       .then((token) => AsyncStorage.setItem("token", token)) // store token
       .then(() => {
-        Alert.alert("Register Success", `Welcome`, [
+        Alert.alert("Register Success", `Welcome to the app`, [
           {
             text: "Ok",
             onPress: () => navigation.navigate("home"),
