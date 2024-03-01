@@ -4,7 +4,9 @@ import { useSelector, useDispatch } from "react-redux";
 const Detail = ({ navigation }) => {
   const count = useSelector((state) => state.counter.count);
   const globalStyle = useSelector((state) => state.style.globalStyle);
-
+  const anime = useSelector((state) => state.anime);
+  const dispatch = useDispatch();
+  console.log(anime);
   return (
     <SafeAreaView style={globalStyle.container}>
       <Text style={styles.textCount}>Count : {count}</Text>

@@ -7,16 +7,21 @@ import {
   Button,
   Alert,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { useState, useEffect } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { FIREBASE_AUTH } from "../helpers/firebase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch, useSelector } from "react-redux";
+import { signInUser } from "../reducers/auth";
 
 const Login = ({ navigation }) => {
   const auth = FIREBASE_AUTH;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const authState = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     AsyncStorage.getItem("token").then((token) => {
@@ -26,30 +31,60 @@ const Login = ({ navigation }) => {
     });
   }, []);
 
-  const handleLogin = async () => {
-    await signInWithEmailAndPassword(auth, email, password) // sign in user
-      .then((response) => response.user.getIdToken()) // call user id token
-      .then((token) => AsyncStorage.setItem("token", token)) // store token
-      .then(() => {
+  // useEffect(() => {
+  //   if (authState.token !== null) {
+  //     Alert.alert("Login Success", `Welcome to the app`, [
+  //       {
+  //         text: "Ok",
+  //         onPress: () => {
+  //           navigation.navigate("home");
+  //         },
+  //       },
+  //     ]);
+  //   }
+  // }, [authState.token]);
+
+  const handleLogin = () => {
+    // await signInWithEmailAndPassword(auth, email, password) // sign in user
+    //   .then((response) => response.user.getIdToken()) // call user id token
+    //   .then((token) => AsyncStorage.setItem("token", token)) // store token
+    //   .then(() => {
+    //     Alert.alert("Login Success", `Welcome to the app`, [
+    //       {
+    //         text: "Ok",
+    //         onPress: () => navigation.navigate("home"),
+    //       },
+    //     ]);
+    //   })
+    //   .catch((error) => {
+    //     console.error(error);
+    //     if (error.message === "Firebase: Error (auth/invalid-credential).") {
+    //       Alert.alert("Invalid Login", "Invalid credential email/password");
+    //     } else {
+    //       Alert.alert("Invalid Login", error.message);
+    //     }
+    //   });
+    const payload = {
+      email: email,
+      password: password,
+    };
+    dispatch(signInUser(payload))
+      .unwrap() // return Promise if action is async thunk action
+      .then(() =>
         Alert.alert("Login Success", `Welcome to the app`, [
           {
             text: "Ok",
-            onPress: () => navigation.navigate("home"),
+            onPress: () => {
+              navigation.navigate("home");
+            },
           },
-        ]);
-      })
-      .catch((error) => {
-        console.error(error);
-        if (error.message === "Firebase: Error (auth/invalid-credential).") {
-          Alert.alert("Invalid Login", "Invalid credential email/password");
-        } else {
-          Alert.alert("Invalid Login", error.message);
-        }
-      });
+        ])
+      );
   };
 
   return (
     <SafeAreaView style={styles.container}>
+      {authState.loading ? <ActivityIndicator /> : null}
       <Text style={styles.textLabel}>Email</Text>
       <TextInput
         style={styles.input}

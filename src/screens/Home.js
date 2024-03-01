@@ -7,11 +7,14 @@ import {
   Image,
   View,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { counterActions } from "../reducers/counter";
+import axios from "axios";
+import { getAnime } from "../reducers/anime";
 
 const Home = ({ navigation }) => {
   // const [anime, setAnime] = useState([]);
@@ -29,7 +32,13 @@ const Home = ({ navigation }) => {
   // });
   const count = useSelector((state) => state.counter.count);
   const globalStyle = useSelector((state) => state.style.globalStyle);
+  const authState = useSelector((state) => state.auth);
+  const anime = useSelector((state) => state.anime);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getAnime());
+  }, [dispatch]);
 
   const handleLogout = () => {
     AsyncStorage.removeItem("token").then((token) => {
@@ -56,7 +65,7 @@ const Home = ({ navigation }) => {
           )}
         />
       )} */}
-      <Text style={styles.textCount}>Counter: {count}</Text>
+      {/* <Text style={styles.textCount}>Counter: {count}</Text>
       <Button
         title={"Increment"}
         onPress={() => dispatch(counterActions.increment())}
@@ -65,8 +74,38 @@ const Home = ({ navigation }) => {
         title={"Decrement"}
         color="#ef233c"
         onPress={() => dispatch(counterActions.decrement())}
+      /> */}
+
+      {anime.loading ? (
+        <ActivityIndicator />
+      ) : (
+        <FlatList
+          data={anime.data}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() => navigation.navigate("detail", { data: item })}
+            >
+              <View style={styles.horizontal}>
+                <Image
+                  style={styles.image}
+                  source={{
+                    uri: item.images.jpg.image_url,
+                  }}
+                />
+                <View style={styles.vertical}>
+                  <Text style={styles.textTitle}>{item.title}</Text>
+                  <Text style={styles.textYear}>{item.year}</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          )}
+        />
+      )}
+      <Button
+        title="Go to Detail"
+        color="#168aad"
+        onPress={() => navigation.navigate("detail")}
       />
-      <Button title="Go to Detail" color="#168aad" onPress={() => navigation.navigate("detail")}/>
       <Button title="Logout" color="#fb8500" onPress={handleLogout} />
     </SafeAreaView>
   );
@@ -75,20 +114,30 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
   },
   image: {
     width: 80,
     height: 100,
+    borderRadius: 8,
+  },
+  vertical: {
+    flexDirection: "column",
+    flex: 1,
   },
   horizontal: {
     flexDirection: "row",
     marginBottom: 16,
-    paddingLeft: 16,
+    marginHorizontal: 16,
+    backgroundColor: "#fff",
+    borderRadius: 10,
   },
   textTitle: {
-    marginLeft: 8,
+    paddingHorizontal: 8,
+    flex: 1,
+    paddingTop: 8,
+  },
+  textYear: {
+    paddingHorizontal: 8,
     flex: 1,
   },
   textCount: {
@@ -97,7 +146,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderWidth: 1,
     borderRadius: 10,
-    marginBottom: 8
+    marginBottom: 8,
   },
 });
 

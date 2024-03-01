@@ -8,8 +8,6 @@ const styleSlice = createSlice({
       container: {
         flex: 1,
         backgroundColor: "#fff",
-        alignItems: "center",
-        justifyContent: "center",
         backgroundColor: "#a3cef1",
       },
     }),
