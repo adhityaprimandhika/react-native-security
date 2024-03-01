@@ -33,7 +33,7 @@ const Home = ({ navigation }) => {
   const count = useSelector((state) => state.counter.count);
   const globalStyle = useSelector((state) => state.style.globalStyle);
   const authState = useSelector((state) => state.auth);
-  const anime = useSelector((state) => state.anime);
+  const animeState = useSelector((state) => state.anime);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -76,14 +76,18 @@ const Home = ({ navigation }) => {
         onPress={() => dispatch(counterActions.decrement())}
       /> */}
 
-      {anime.loading ? (
+      {animeState.loading ? (
         <ActivityIndicator />
       ) : (
         <FlatList
-          data={anime.data}
+          data={animeState.data}
           renderItem={({ item }) => (
             <TouchableOpacity
-              onPress={() => navigation.navigate("detail", { data: item })}
+              onPress={() => {
+                navigation.navigate("detail", {
+                  id: item.mal_id,
+                });
+              }}
             >
               <View style={styles.horizontal}>
                 <Image
@@ -101,11 +105,11 @@ const Home = ({ navigation }) => {
           )}
         />
       )}
-      <Button
+      {/* <Button
         title="Go to Detail"
         color="#168aad"
         onPress={() => navigation.navigate("detail")}
-      />
+      /> */}
       <Button title="Logout" color="#fb8500" onPress={handleLogout} />
     </SafeAreaView>
   );
@@ -139,6 +143,7 @@ const styles = StyleSheet.create({
   textYear: {
     paddingHorizontal: 8,
     flex: 1,
+    marginTop: 16,
   },
   textCount: {
     textAlign: "center",
